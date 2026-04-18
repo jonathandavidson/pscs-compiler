@@ -10,7 +10,7 @@ namespace Pscs.Demo
             {
                 if (arg == "--help")
                 {
-                    Console.WriteLine("Usage: app.ps1 [--help]");
+                    Help.Print();
                     return;
                 }
             }
