@@ -7,7 +7,7 @@ $libDir = Join-Path $here 'lib'
 $usings = [System.Collections.Generic.HashSet[string]]::new()
 $bodies  = @()
 
-Get-ChildItem -Path $libDir -Filter *.cs | ForEach-Object {
+Get-ChildItem -Path $libDir -Filter *.cs -Recurse | ForEach-Object {
     $lines = Get-Content -LiteralPath $_.FullName
     $body  = @()
     foreach ($line in $lines) {
