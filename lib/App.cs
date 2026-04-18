@@ -6,16 +6,22 @@ namespace Pscs.Demo
     {
         public static void Run(string[] args)
         {
-            foreach (var arg in args)
+            string name = null;
+
+            for (int i = 0; i < args.Length; i++)
             {
-                if (arg == "--help")
+                switch (args[i])
                 {
-                    Help.Print();
-                    return;
+                    case "--help":
+                        Help.Print();
+                        return;
+                    case "--name":
+                        name = args[++i];
+                        break;
                 }
             }
 
-            Console.WriteLine("Hello, World!");
+            Hello.Print(name);
         }
     }
 }

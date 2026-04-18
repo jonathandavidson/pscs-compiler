@@ -6,7 +6,7 @@ namespace Pscs.Demo
     {
         public static void Print()
         {
-            Console.WriteLine("Usage: app.ps1 [--help]");
+            Console.WriteLine("Usage: app.ps1 [--name <name>] [--help]");
         }
     }
 }
