@@ -9,8 +9,9 @@ one in-memory assembly via `Add-Type`, then runs the `App` class.
 | --- | --- |
 | `app.ps1` | Entrypoint. Compiles lib and forwards all args to `App.Run()`. |
 | `lib/App.cs` | Parses CLI arguments and delegates to the appropriate class. |
-| `lib/Hello.cs` | Prints a hello message, optionally addressed to a name. |
-| `lib/Help.cs` | Prints usage information. |
+| `lib/handlers/Hello.cs` | Prints a hello message, optionally addressed to a name. |
+| `lib/handlers/Help.cs` | Prints usage information. |
+| `lib/handlers/Config.cs` | Loads and parses a JSON config file. |
 
 ## Usage
 
@@ -21,9 +22,33 @@ powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1
 # Hello, <name>!
 powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --name Alice
 
+# Load a config file, then greet
+powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --config .\config.json
+
 # Print usage
 powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --help
 ```
+
+## Parameters
+
+| Parameter | Description |
+| --- | --- |
+| `--name <name>` | Name to greet. Takes precedence over a name in the config file. |
+| `--config <path>` | Path to a JSON config file. Must be valid JSON. If a `name` property is present it is used as the greeting name. |
+| `--help` | Print usage information. |
+
+## Config file
+
+A config file is a plain JSON object. The `name` property is the only
+recognised key at this time:
+
+```json
+{
+  "name": "Alice"
+}
+```
+
+If `--name` and `--config` are both provided, `--name` takes precedence.
 
 ## Notes / gotchas
 
