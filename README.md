@@ -7,13 +7,22 @@ one in-memory assembly via `Add-Type`, then runs the `App` class.
 
 | File | What it shows |
 | --- | --- |
-| `app.ps1` | Entrypoint. Compiles lib and calls `App.Run()`. |
-| `lib/App.cs` | Hello World app class. |
+| `app.ps1` | Entrypoint. Compiles lib and forwards all args to `App.Run()`. |
+| `lib/App.cs` | Parses CLI arguments and delegates to the appropriate class. |
+| `lib/Hello.cs` | Prints a hello message, optionally addressed to a name. |
+| `lib/Help.cs` | Prints usage information. |
 
 ## Usage
 
 ```powershell
+# Hello, World!
 powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1
+
+# Hello, <name>!
+powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --name Alice
+
+# Print usage
+powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --help
 ```
 
 ## Notes / gotchas
@@ -22,4 +31,6 @@ powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1
   same session throws "type already exists" — start a fresh PowerShell session.
 - `using` directives are hoisted and deduplicated before the source is handed
   to the compiler; `using (var ...)` statements are left in place.
+- `app.ps1` forwards `$args` directly to `App.Run()` — adding new parameters
+  to the C# classes requires no changes to the entrypoint script.
 - For anything non-trivial, prefer a real .dll: `dotnet build` + `Add-Type -Path .\App.dll`.
