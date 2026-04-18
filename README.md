@@ -7,29 +7,14 @@ one in-memory assembly via `Add-Type`, then runs the `App` class.
 
 | File | What it shows |
 | --- | --- |
-| `app.ps1` | Entrypoint. Compiles lib, maps PS params to `App.Run(string[])`. |
-| `lib/App.cs` | CLI app class — fetches a URL and prints status/body or headers. |
+| `app.ps1` | Entrypoint. Compiles lib and calls `App.Run()`. |
+| `lib/App.cs` | Hello World app class. |
 
 ## Usage
 
 ```powershell
-# fetch body
-powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --url https://example.com
-
-# headers only
-powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --url https://example.com --headers
-
-# custom timeout (ms)
-powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --url https://example.com --timeout 5000
+powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1
 ```
-
-## Parameters
-
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--url` | string | required | URL to fetch |
-| `--timeout` | int (ms) | 10000 | Request timeout |
-| `--headers` | switch | false | Print headers only, suppress body |
 
 ## Notes / gotchas
 

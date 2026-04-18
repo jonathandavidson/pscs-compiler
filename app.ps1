@@ -1,19 +1,4 @@
 #requires -Version 5.1
-<#
-    Single entrypoint: compile every lib/*.cs file together in one Add-Type
-    call, then delegate to the App class, forwarding all script arguments.
-
-    Usage:
-        powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --url https://example.com
-        powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --url https://example.com --headers
-        powershell -ExecutionPolicy Bypass -NoProfile -File .\app.ps1 --url https://example.com --timeout 5000
-#>
-
-param(
-    [string]$url,
-    [int]$timeout = 0,
-    [switch]$headers
-)
 
 $ErrorActionPreference = 'Stop'
 $here   = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -36,14 +21,6 @@ $merged = ($usings -join [Environment]::NewLine) `
         + [Environment]::NewLine `
         + ($bodies -join [Environment]::NewLine)
 
-Add-Type `
-    -TypeDefinition $merged `
-    -Language CSharp `
-    -ReferencedAssemblies 'System.Net','System.Core'
+Add-Type -TypeDefinition $merged -Language CSharp
 
-$appArgs = @()
-if ($url)           { $appArgs += '--url';     $appArgs += $url }
-if ($timeout -gt 0) { $appArgs += '--timeout'; $appArgs += "$timeout" }
-if ($headers)       { $appArgs += '--headers' }
-
-[Pscs.Demo.App]::Run($appArgs)
+[Pscs.Demo.App]::Run(@())
