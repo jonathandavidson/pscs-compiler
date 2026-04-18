@@ -6,7 +6,8 @@ namespace Pscs.Demo
     {
         public static void Run(string[] args)
         {
-            string name = null;
+            string name   = null;
+            string config = null;
 
             for (int i = 0; i < args.Length; i++)
             {
@@ -18,8 +19,14 @@ namespace Pscs.Demo
                     case "--name":
                         name = args[++i];
                         break;
+                    case "--config":
+                        config = args[++i];
+                        break;
                 }
             }
+
+            if (config != null && !Config.Load(config, ref name))
+                return;
 
             Hello.Print(name);
         }

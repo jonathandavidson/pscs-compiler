@@ -21,6 +21,6 @@ $merged = ($usings -join [Environment]::NewLine) `
         + [Environment]::NewLine `
         + ($bodies -join [Environment]::NewLine)
 
-Add-Type -TypeDefinition $merged -Language CSharp
+Add-Type -TypeDefinition $merged -Language CSharp -ReferencedAssemblies 'System.Web.Extensions'
 
 [Pscs.Demo.App]::Run($args)
