@@ -21,6 +21,10 @@ $merged = ($usings -join [Environment]::NewLine) `
         + [Environment]::NewLine `
         + ($bodies -join [Environment]::NewLine)
 
-Add-Type -TypeDefinition $merged -Language CSharp -ReferencedAssemblies 'System.Web.Extensions'
+$refs = [System.AppDomain]::CurrentDomain.GetAssemblies() |
+    Where-Object { -not $_.IsDynamic -and $_.Location } |
+    Select-Object -ExpandProperty Location
+
+Add-Type -TypeDefinition $merged -Language CSharp -ReferencedAssemblies $refs
 
 [Pscs.Demo.App]::Run($args)

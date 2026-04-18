@@ -50,6 +50,25 @@ recognised key at this time:
 
 If `--name` and `--config` are both provided, `--name` takes precedence.
 
+## Assembly references
+
+`app.ps1` does not maintain a hardcoded `-ReferencedAssemblies` list. Instead
+it queries the assemblies already loaded into the current `AppDomain` at
+runtime:
+
+```powershell
+$refs = [System.AppDomain]::CurrentDomain.GetAssemblies() |
+    Where-Object { -not $_.IsDynamic -and $_.Location } |
+    Select-Object -ExpandProperty Location
+```
+
+PowerShell 5.1 loads a broad set of .NET Framework assemblies on startup, so
+any standard library namespace a `.cs` file references will already be present.
+Dynamic assemblies (those with no on-disk path) are excluded because
+`Add-Type` cannot reference them by path. Adding a new `using` directive to a
+`.cs` file requires no changes to `app.ps1` as long as the assembly is part of
+the standard .NET Framework — which covers all typical use cases.
+
 ## Notes / gotchas
 
 - `Add-Type` caches by type name in the current session. Re-running in the
