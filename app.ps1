@@ -23,4 +23,4 @@ $merged = ($usings -join [Environment]::NewLine) `
 
 Add-Type -TypeDefinition $merged -Language CSharp
 
-[Pscs.Demo.App]::Run(@())
+[Pscs.Demo.App]::Run($args)
