@@ -53,21 +53,31 @@ If `--name` and `--config` are both provided, `--name` takes precedence.
 ## Assembly references
 
 `app.ps1` does not maintain a hardcoded `-ReferencedAssemblies` list. Instead
-it queries the assemblies already loaded into the current `AppDomain` at
-runtime:
+it resolves references in two passes:
 
-```powershell
-$refs = [System.AppDomain]::CurrentDomain.GetAssemblies() |
-    Where-Object { -not $_.IsDynamic -and $_.Location } |
-    Select-Object -ExpandProperty Location
-```
+1. **AppDomain sweep.** Every non-dynamic assembly already loaded into the
+   current `AppDomain` is added to the reference set, and its exported
+   namespaces are recorded as "covered."
+2. **GAC fallback.** The `using` directives hoisted from the merged source are
+   parsed into a set of required namespaces. Any namespace not already covered
+   triggers a scan of `GAC_MSIL`, `GAC_64`, and `GAC_32` under
+   `%windir%\Microsoft.NET\assembly\`. Each DLL is opened with
+   `Assembly.ReflectionOnlyLoadFrom`, its exported namespaces inspected, and
+   the first assembly that provides a missing namespace is added to the
+   reference set. A `ReflectionOnlyAssemblyResolve` handler is attached during
+   the scan so transitive metadata references resolve against the GAC as well.
+   The scan stops early once every needed namespace has been satisfied.
 
-PowerShell 5.1 loads a broad set of .NET Framework assemblies on startup, so
-any standard library namespace a `.cs` file references will already be present.
-Dynamic assemblies (those with no on-disk path) are excluded because
-`Add-Type` cannot reference them by path. Adding a new `using` directive to a
-`.cs` file requires no changes to `app.ps1` as long as the assembly is part of
-the standard .NET Framework — which covers all typical use cases.
+Adding a new `using` directive to a `.cs` file requires no changes to
+`app.ps1` as long as the target namespace is provided by some assembly
+already loaded in the AppDomain or present in the GAC — which covers the
+entire standard .NET Framework surface, including assemblies that PowerShell
+does not pre-load (e.g. `System.Web.Extensions` for
+`System.Web.Script.Serialization`).
+
+The GAC scan adds a one-time startup cost (typically a few hundred
+milliseconds) and only runs when the AppDomain sweep left something
+unresolved.
 
 ## Notes / gotchas
 
